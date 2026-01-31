@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Money | Hsieh Yi-yi</title>
+    <style>
+        :root {
+            --bg-color: #ffffff; /* Stark white for a clinical, 'archive' feel */
+            --text-color: #000000;
+            --accent-color: #555;
+            --font-main: 'Courier New', Courier, monospace; /* Monospace fits the 'data/finance' theme */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        /* Minimal Navigation */
+        nav {
+            padding: 2rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .project-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Statement Section */
+        .intro {
+            max-width: 600px;
+            margin: 4rem 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        /* The Comparison Grid */
+        .grid-container {
+            display: grid;
+            /* This creates two equal columns for side-by-side comparison */
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px;
+            padding: 2rem;
+            align-items: start;
+        }
+
+        .grid-item {
+            width: 100%;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: grayscale(100%); /* Optional: Adds to the 'archive' look */
+        }
+
+        .caption {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* Responsive: Stack images on mobile phones */
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="project-title">Project: Easy Money</div>
+        <div>2026</div>
+    </nav>
+
+    <section class="intro">
+        <h1>Valuation / Land</h1>
+        <p>
+            A 120mm photographic study on the price of land. 
+            This archive uses a grid structure to draw parallel comparisons 
+            between the physical landscape and its assigned financial value.
+        </p>
+    </section>
+
+    <section class="grid-container">
+        
+        <div class="grid-item">
+            <img src="scan.jpg" alt="120mm film scan of land">
+            <div class="caption">FIG A. THE LANDSCAPE</div>
+        </div>
+
+        <div class="grid-item">
+            <img src="scan.jpg" alt="Comparison grid"> 
+            <div class="caption">FIG B. THE VALUATION</div>
+        </div>
+
+    </section>
+
+</body>
+</html>
