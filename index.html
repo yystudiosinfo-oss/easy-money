@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Money | Hsieh Yi-yi</title>
+
+    <!-- Leaflet.js for the interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
-            --bg-color: #ffffff; /* Stark white for a clinical, 'archive' feel */
+            --bg-color: #ffffff;
             --text-color: #000000;
             --accent-color: #555;
-            --font-main: 'Courier New', Courier, monospace; /* Monospace fits the 'data/finance' theme */
+            --dim-color: #888;
+            --border-color: #eee;
+            --font-main: 'Courier New', Courier, monospace;
         }
 
         body {
@@ -21,18 +28,36 @@
             line-height: 1.5;
         }
 
-        /* Minimal Navigation */
+        /* Navigation */
         nav {
             padding: 2rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .project-title {
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
         }
 
         /* Statement Section */
@@ -47,18 +72,188 @@
             font-weight: normal;
         }
 
+        h2 {
+            font-size: 0.85rem;
+            font-weight: normal;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin: 0 0 1rem 0;
+        }
+
         p {
             font-size: 0.9rem;
             color: var(--accent-color);
         }
 
-        /* The Comparison Grid */
+        /* Section divider */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 0;
+        }
+
+        /* ── MAP SECTION ── */
+        .map-section {
+            padding: 3rem 2rem;
+        }
+
+        .map-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .map-meta {
+            font-size: 0.75rem;
+            color: var(--dim-color);
+            margin-top: 0.25rem;
+        }
+
+        #map {
+            width: 100%;
+            height: 520px;
+            border: 1px solid var(--border-color);
+            /* Desaturate tiles to match the archive palette */
+            filter: grayscale(80%) contrast(1.05);
+        }
+
+        /* Custom marker dot */
+        .marker-dot {
+            width: 10px;
+            height: 10px;
+            background: #000;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #000;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .marker-dot:hover,
+        .marker-dot.active {
+            transform: scale(1.6);
+            background: #000;
+        }
+
+        /* Leaflet popup overrides */
+        .leaflet-popup-content-wrapper {
+            border-radius: 0;
+            box-shadow: none;
+            border: 1px solid #000;
+            font-family: var(--font-main);
+            font-size: 0.78rem;
+            padding: 0;
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 0.75rem 1rem;
+        }
+
+        .leaflet-popup-tip-container {
+            display: none;
+        }
+
+        .popup-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.72rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .popup-count {
+            color: var(--dim-color);
+            font-size: 0.7rem;
+        }
+
+        .popup-hint {
+            color: var(--dim-color);
+            font-size: 0.68rem;
+            margin-top: 0.4rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.4rem;
+        }
+
+        /* ── LOCATION PHOTO PANEL ── */
+        .location-panel {
+            border-top: 1px solid var(--border-color);
+            padding: 2.5rem 2rem;
+            display: none;
+        }
+
+        .location-panel.visible {
+            display: block;
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .location-name {
+            font-size: 1.4rem;
+            font-weight: normal;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .location-coords {
+            font-size: 0.75rem;
+            color: var(--dim-color);
+        }
+
+        .location-close {
+            background: none;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-main);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            color: var(--accent-color);
+        }
+
+        .location-close:hover {
+            border-color: #000;
+            color: #000;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .location-grid-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: grayscale(100%);
+        }
+
+        .location-grid-item .caption {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--dim-color);
+        }
+
+        .no-photos {
+            font-size: 0.85rem;
+            color: var(--dim-color);
+            padding: 2rem 0;
+        }
+
+        /* ── ARCHIVE GRID ── */
+        .archive-section {
+            padding: 3rem 2rem;
+        }
+
         .grid-container {
             display: grid;
-            /* This creates two equal columns for side-by-side comparison */
-            grid-template-columns: 1fr 1fr; 
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            padding: 2rem;
             align-items: start;
         }
 
@@ -70,19 +265,29 @@
             width: 100%;
             height: auto;
             display: block;
-            filter: grayscale(100%); /* Optional: Adds to the 'archive' look */
+            filter: grayscale(100%);
         }
 
         .caption {
             margin-top: 0.5rem;
             font-size: 0.75rem;
-            color: #888;
+            color: var(--dim-color);
         }
 
-        /* Responsive: Stack images on mobile phones */
+        /* Responsive */
         @media (max-width: 768px) {
-            .grid-container {
+            .grid-container,
+            .location-grid {
                 grid-template-columns: 1fr;
+            }
+
+            #map {
+                height: 360px;
+            }
+
+            .location-header {
+                flex-direction: column;
+                gap: 1rem;
             }
         }
     </style>
@@ -91,31 +296,255 @@
 
     <nav>
         <div class="project-title">Project: Easy Money</div>
+        <div class="nav-links">
+            <a href="#map-section">Map</a>
+            <a href="#archive-section">Archive</a>
+        </div>
         <div>2026</div>
     </nav>
 
     <section class="intro">
         <h1>Valuation / Land</h1>
         <p>
-            A 120mm photographic study on the price of land. 
-            This archive uses a grid structure to draw parallel comparisons 
+            A 120mm photographic study on the price of land.
+            This archive uses a grid structure to draw parallel comparisons
             between the physical landscape and its assigned financial value.
+            Lottery stations were documented across Taiwan — including the offshore
+            islands — as fixed points of informal economy embedded in the landscape.
         </p>
     </section>
 
-    <section class="grid-container">
-        
-        <div class="grid-item">
-            <img src="images/000322090007.jpg" alt="120mm film scan of land">
-            <div class="caption">FIG A. THE LANDSCAPE</div>
+    <hr class="section-divider">
+
+    <!-- MAP -->
+    <section class="map-section" id="map-section">
+        <div class="map-header">
+            <h2>Field Locations — Taiwan &amp; Offshore Islands</h2>
+            <div class="map-meta">Select a marker to view photographs from that site.</div>
         </div>
 
-        <div class="grid-item">
-            <img src="images/000322090008.jpg" alt="Comparison grid">
-            <div class="caption">FIG B. THE VALUATION</div>
-        </div>
-
+        <div id="map"></div>
     </section>
+
+    <!-- LOCATION PHOTO PANEL (revealed on marker click) -->
+    <section class="location-panel" id="location-panel">
+        <div class="location-header">
+            <div>
+                <div class="location-name" id="panel-name"></div>
+                <div class="location-coords" id="panel-coords"></div>
+            </div>
+            <button class="location-close" id="panel-close">&#x2715; Close</button>
+        </div>
+        <div class="location-grid" id="panel-grid"></div>
+        <div class="no-photos" id="panel-empty" style="display:none;">
+            — No photographs archived for this site yet.
+        </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ARCHIVE GRID -->
+    <section class="archive-section" id="archive-section">
+        <h2>Archive — Comparison Grid</h2>
+        <div class="grid-container">
+
+            <div class="grid-item">
+                <img src="images/000322090007.jpg" alt="120mm film scan of land">
+                <div class="caption">FIG A. THE LANDSCAPE</div>
+            </div>
+
+            <div class="grid-item">
+                <img src="images/000322090008.jpg" alt="Comparison grid">
+                <div class="caption">FIG B. THE VALUATION</div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // ── LOCATION DATABASE ──────────────────────────────────────────────────
+        // Each entry represents one field site. Add photos[] entries as the
+        // archive grows. coords: [lat, lng]
+        const locations = [
+            {
+                id: "taipei-zhongshan",
+                name: "Taipei — Zhongshan District",
+                coords: [25.0631, 121.5241],
+                photos: [
+                    { src: "images/000322090007.jpg", caption: "FIG 01. THE LANDSCAPE" },
+                    { src: "images/000322090008.jpg", caption: "FIG 02. THE VALUATION" }
+                ]
+            },
+            {
+                id: "kaohsiung-sanmin",
+                name: "Kaohsiung — Sanmin District",
+                coords: [22.6472, 120.3115],
+                photos: [
+                    { src: "images/000322090009.jpg", caption: "FIG 03. THE LANDSCAPE" },
+                    { src: "images/000322090010.jpg", caption: "FIG 04. THE VALUATION" }
+                ]
+            },
+            {
+                id: "tainan-anping",
+                name: "Tainan — Anping District",
+                coords: [22.9921, 120.1617],
+                photos: []
+            },
+            {
+                id: "taichung-xitun",
+                name: "Taichung — Xitun District",
+                coords: [24.1637, 120.6467],
+                photos: [
+                    { src: "images/000322090011.jpg", caption: "FIG 05. THE LANDSCAPE" },
+                    { src: "images/000322090012.jpg", caption: "FIG 06. THE VALUATION" }
+                ]
+            },
+            {
+                id: "hualien-city",
+                name: "Hualien City",
+                coords: [23.9769, 121.6044],
+                photos: []
+            },
+            {
+                id: "penghu-magong",
+                name: "Penghu — Magong",
+                coords: [23.5654, 119.5795],
+                photos: []
+            },
+            {
+                id: "kinmen-jincheng",
+                name: "Kinmen — Jincheng",
+                coords: [24.4326, 118.3170],
+                photos: []
+            },
+            {
+                id: "matsu-nangan",
+                name: "Matsu — Nangan",
+                coords: [26.1579, 119.9510],
+                photos: []
+            },
+            {
+                id: "ludao",
+                name: "Green Island (Lǜdǎo)",
+                coords: [22.6697, 121.4893],
+                photos: []
+            },
+            {
+                id: "lanyu",
+                name: "Orchid Island (Lányǔ)",
+                coords: [22.0426, 121.5480],
+                photos: []
+            }
+        ];
+
+        // ── MAP INITIALISATION ─────────────────────────────────────────────────
+        const map = L.map('map', {
+            center: [23.6, 120.9],
+            zoom: 7,
+            zoomControl: true,
+            attributionControl: true
+        });
+
+        // CartoDB "light_all" tiles — clean and minimal, fits the archive palette
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        // ── CUSTOM MARKER ICON ─────────────────────────────────────────────────
+        function makeIcon(active = false) {
+            return L.divIcon({
+                className: '',
+                html: `<div class="marker-dot${active ? ' active' : ''}"></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7],
+                popupAnchor: [0, -12]
+            });
+        }
+
+        // ── PANEL LOGIC ────────────────────────────────────────────────────────
+        const panel      = document.getElementById('location-panel');
+        const panelName  = document.getElementById('panel-name');
+        const panelCoords = document.getElementById('panel-coords');
+        const panelGrid  = document.getElementById('panel-grid');
+        const panelEmpty = document.getElementById('panel-empty');
+        const panelClose = document.getElementById('panel-close');
+
+        let activeMarker = null;
+
+        function formatCoords(coords) {
+            const lat = coords[0].toFixed(4);
+            const lng = coords[1].toFixed(4);
+            const latDir = coords[0] >= 0 ? 'N' : 'S';
+            const lngDir = coords[1] >= 0 ? 'E' : 'W';
+            return `${Math.abs(lat)}°${latDir}  ${Math.abs(lng)}°${lngDir}`;
+        }
+
+        function openPanel(loc, marker) {
+            // Reset active marker icon
+            if (activeMarker && activeMarker !== marker) {
+                activeMarker.setIcon(makeIcon(false));
+            }
+            marker.setIcon(makeIcon(true));
+            activeMarker = marker;
+
+            // Populate header
+            panelName.textContent = loc.name;
+            panelCoords.textContent = formatCoords(loc.coords);
+
+            // Populate grid
+            panelGrid.innerHTML = '';
+            if (loc.photos.length === 0) {
+                panelEmpty.style.display = 'block';
+                panelGrid.style.display = 'none';
+            } else {
+                panelEmpty.style.display = 'none';
+                panelGrid.style.display = 'grid';
+                loc.photos.forEach(photo => {
+                    const item = document.createElement('div');
+                    item.className = 'location-grid-item';
+                    item.innerHTML = `
+                        <img src="${photo.src}" alt="${loc.name}" loading="lazy">
+                        <div class="caption">${photo.caption}</div>
+                    `;
+                    panelGrid.appendChild(item);
+                });
+            }
+
+            // Show panel and scroll to it
+            panel.classList.add('visible');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closePanel() {
+            panel.classList.remove('visible');
+            if (activeMarker) {
+                activeMarker.setIcon(makeIcon(false));
+                activeMarker = null;
+            }
+        }
+
+        panelClose.addEventListener('click', closePanel);
+
+        // ── PLACE MARKERS ──────────────────────────────────────────────────────
+        locations.forEach(loc => {
+            const marker = L.marker(loc.coords, { icon: makeIcon() });
+
+            const photoLabel = loc.photos.length === 0
+                ? '— no photographs yet'
+                : `${loc.photos.length} photograph${loc.photos.length > 1 ? 's' : ''} archived`;
+
+            marker.bindPopup(`
+                <div class="popup-name">${loc.name}</div>
+                <div class="popup-count">${photoLabel}</div>
+                <div class="popup-hint">click marker to view</div>
+            `);
+
+            marker.on('click', () => openPanel(loc, marker));
+            marker.addTo(map);
+        });
+    </script>
 
 </body>
 </html>
